@@ -1,6 +1,6 @@
 var sq = window.sq;
 sq.version = '0.0.1';
-sq.host =  'https://rawgit.com/metatrevor/squirt/master/';
+sq.host =  'https://rawgit.com/notadice/squirt/master/';
 
 (function(Keen){
   Keen.addEvent('load');
