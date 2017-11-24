@@ -52,13 +52,18 @@ sq.progressBarLocation = sq.progressBarLocation || 'bottom';
 		let removeElements = (elms) => Array.from(elms).forEach(el => el.remove());	
 		removeElements( article.querySelectorAll(".image-and-copyright-container") );	
 		removeElements( article.querySelectorAll("sup") );		
+		removeElements( article.querySelectorAll("script") );
 		removeElements( article.querySelectorAll("noscript") );
-		
+
 		if (window.location.hostname.indexOf('wikipedia.org') != -1){
 			removeElements( article.querySelectorAll(".infobox") );
 			removeElements( article.querySelectorAll(".reflist") );
 		}
-
+		if (window.location.hostname.indexOf('businessinsider.com') != -1){
+			removeElements( article.querySelectorAll(".source") );
+			removeElements( article.querySelectorAll(".slideshow-content") );
+		}
+		
 		return article;
 	}
 	
@@ -84,7 +89,6 @@ sq.progressBarLocation = sq.progressBarLocation || 'bottom';
 		let article = readability.grabArticle();
 		// Read text
 		article = removeUnwantedElements(article)
-		console.log(readability.grabArticleText(article));
 		read(readability.grabArticleText(article));
       };
 
