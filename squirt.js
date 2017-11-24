@@ -45,6 +45,14 @@ sq.cookies = {
       getText(read);
     };
 
+	function removeUnwantedElements(article){
+		// Custom element removal
+		let removeElements = (elms) => Array.from(elms).forEach(el => el.remove());	
+		removeElements( article.querySelectorAll(".image-and-copyright-container") );	
+		removeElements( article.querySelectorAll("sup") );		
+		return article;
+	}
+	
     function getText(read){
       // text source: demo
       if(window.squirtText) return read(window.squirtText);
@@ -56,6 +64,7 @@ sq.cookies = {
         for (var i = 0, len = selection.rangeCount; i < len; ++i) {
           container.appendChild(selection.getRangeAt(i).cloneContents());
         }
+		container = removeUnwantedElements(container);
         return read(container.textContent);
       }
 
@@ -64,10 +73,8 @@ sq.cookies = {
       function readabilityReady(){
         handler && document.removeEventListener('readility.ready', handler);
 		let article = readability.grabArticle();
-		// Custom element removal
-		let removeElements = (elms) => Array.from(elms).forEach(el => el.remove());	
-		removeElements( article.querySelectorAll(".image-and-copyright-container") );	
 		// Read text
+		article = removeUnwantedElements(article)
 		read(readability.grabArticleText(article));
       };
 
@@ -90,7 +97,7 @@ sq.cookies = {
     function incrememntNodeIdx(increment){
       var ret = nodeIdx;
       nodeIdx += increment || 1;
-      nodeIdx = Math.max(0, nodeIdx);
+      nodeIdx = Math.max(0, Math.min(nodeIdx, nodes.length));
       prerender();
       return ret;
     };
@@ -104,6 +111,7 @@ sq.cookies = {
     (function readerEventHandlers(){
       on('squirt.close', function(){
         sq.closed = true;
+		dispatch('squirt.updateProgress',{percentage: 0});	
         clearTimeout(nextNodeTimeoutId);
       });
 
@@ -139,8 +147,34 @@ sq.cookies = {
         }
         nextNode(true);
       });
+      on('squirt.seek', function(e){
+        !sq.paused && clearTimeout(nextNodeTimeoutId);
+		let targetNode = percentageToNode(e.percentage);
+		let idxchange = ( ( nodeIdx < targetNode ) ? Math.abs(nodeIdx - targetNode) : -Math.abs(nodeIdx - targetNode) );
+		if (idxchange != 0){
+			incrememntNodeIdx( idxchange );
+			while(!nodes[nodeIdx].word.match(/\./) && nodeIdx < 0){
+			  incrememntNodeIdx(-1);
+			}		
+			nextNode(true);
+			dispatch('squirt.updateProgress',{percentage: nodeToPercentage(targetNode)});
+		}			
+      });
+      on('squirt.updateProgress', function(e){
+		let progressBarPosition = document.getElementById('progress-bar-position');
+		progressBarPosition.setAttribute("style","width:"+e.percentage+"%");		
+      });	  
     })();
 
+    function percentageToNode(percentage){
+		let perNode = (nodes.length) ? (100/nodes.length) : 100;
+		return Math.round((percentage||0)/perNode); 
+    }
+    function nodeToPercentage(node){
+		let perNode = (nodes.length) ? (100/nodes.length) : 100;
+		return Math.min(Math.max(parseFloat(perNode*node), 0), 100);
+    }		
+	
     function pause(){
       sq.paused = true;
       dispatch('squirt.pause.after');
@@ -151,7 +185,7 @@ sq.cookies = {
       sq.paused = false;
       dispatch('squirt.pause.after');
       document.querySelector('.sq .wpm-selector').style.display = 'none'
-      nextNode(e.jumped);
+      nextNode(e.jumped); 
     };
 
     var toRender;
@@ -176,15 +210,23 @@ sq.cookies = {
 
     var delay, jumped, nextIdx;
     function nextNode(jumped) {
+
       lastNode && lastNode.remove();
 
       nextIdx = incrememntNodeIdx();
-      if(nextIdx >= nodes.length) return finalWord();
+	  
+      if(nextIdx >= nodes.length){
+		  dispatch('squirt.updateProgress',{percentage: 100});
+		  return finalWord();
+	  }
 
       lastNode = nodes[nextIdx];
       wordContainer.appendChild(lastNode);
       lastNode.instructions && invoke(lastNode.instructions);
       if(sq.paused) return;
+	  
+	  
+	  dispatch('squirt.updateProgress',{percentage: nodeToPercentage(nextIdx)});
       nextNodeTimeoutId = setTimeout(nextNode, intervalMs * getDelay(lastNode, jumped));
     };
 
@@ -394,7 +436,29 @@ sq.cookies = {
     makeDiv({'class': 'final-word'}, modal);
     var keyboard = makeDiv({'class': 'keyboard-shortcuts'}, reader);
     keyboard.innerText = "Keys: Space, Esc, Up, Down";
+	
+    (function makeProgressBar(){
 
+		var progressBar = makeDiv({'id':'progress-bar','class': 'progress-bar'}, modal);
+		var progressBarInner = makeDiv({'class': 'inner-bar'}, progressBar);
+		var progressBarPosition = makeDiv({'id':'progress-bar-position','class': 'position'}, progressBarInner);
+
+		on(progressBarInner, 'click', function(e){
+			let elem = progressBarInner;
+			let clickedAt = e.offsetX;	
+			let style = window.getComputedStyle(elem, null);
+			let width = parseFloat(style.getPropertyValue("width"), 10);
+			let paddingLeft = parseFloat(style.getPropertyValue('padding-left'), 10);
+			let paddingRight = parseFloat(style.getPropertyValue('padding-right'), 10);
+			let realWidth = width-(paddingLeft+paddingRight);
+			let clickedPosition = (clickedAt < paddingLeft) ? 0 : (clickedAt > realWidth) ? realWidth : clickedAt-paddingLeft;
+			clickedPosition = Math.min(Math.max(parseFloat(clickedPosition), 0), realWidth);
+			let percentage = (clickedPosition / realWidth * 100); 
+			dispatch('squirt.seek', {percentage: percentage});
+		});		
+    })();	
+
+	
     (function make(controls){
 
       // this code is suffering from delirium
