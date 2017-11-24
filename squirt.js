@@ -6,6 +6,7 @@ sq.cookies = {
 	timeout: 3000,
 	values: false
 };
+sq.progressBarLocation = bottom; // bottom | top
 
 (function(){
 
@@ -310,7 +311,7 @@ sq.cookies = {
 			 .replace(/ \./g, '.')
 			 .replace(/(\.[\s])(?=\”)/g, '.')
 			 .replace(/([\s](\-|\—|\–)[\s])/g, ' ')
-             .replace(/[\,\.\!\:\;](?![\"\'\)\]\}\”])/g, "$& ")
+             .replace(/[\,\.\!\:\;](?![\"\'\)\]\}\”])([a-zA-Z0-9]\.{1,}[\,\.\!\:\;])/g, "$& ")
              .split(/[\s]+/g)
              .filter(function(word){ return word.length; })
              .map(wordToNode);
@@ -411,7 +412,8 @@ sq.cookies = {
   }
 
   function makeGUI(){
-    var squirt = makeDiv({class: 'sq'}, document.body);
+	var squirtExtraClass = (sq.progressBarLocation == 'top') ? ' top' : '';  
+    var squirt = makeDiv({class: 'sq'+squirtExtraClass}, document.body);
     squirt.style.display = 'none';
     on('squirt.close', hideGUI);
 	on('mousemove', function(){
@@ -438,7 +440,6 @@ sq.cookies = {
     keyboard.innerText = "Keys: Space, Esc, Up, Down";
 	
     (function makeProgressBar(){
-
 		var progressBar = makeDiv({'id':'progress-bar','class': 'progress-bar'}, modal);
 		var progressBarInner = makeDiv({'class': 'inner-bar'}, progressBar);
 		var progressBarPosition = makeDiv({'id':'progress-bar-position','class': 'position'}, progressBarInner);
@@ -457,7 +458,6 @@ sq.cookies = {
 			dispatch('squirt.seek', {percentage: percentage});
 		});		
     })();	
-
 	
     (function make(controls){
 
