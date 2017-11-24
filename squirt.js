@@ -260,7 +260,7 @@ sq.cookies = {
       return text
 			 .replace(/ \./g, '.')
 			 .replace(/(\.[\s])(?=\”)/g, '.')
-			 .replace(/([\s](\-|\—)[\s])/g, ' ')
+			 .replace(/([\s](\-|\—|\–)[\s])/g, ' ')
              .replace(/[\,\.\!\:\;](?![\"\'\)\]\}\”])/g, "$& ")
              .split(/[\s]+/g)
              .filter(function(word){ return word.length; })
