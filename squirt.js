@@ -1,17 +1,37 @@
 var sq = window.sq;
 sq.version = '0.0.1';
 sq.host =  'https://rawgit.com/rstudios/SquirtLocal/master/';
+sq.cookies = {
+	loader: sq.host + 'cookies.html',
+	timeout: 3000,
+	values: false
+};
 
 (function(){
 
-  on('mousemove', function(){
-	let sq_modal = document.querySelector('.sq .modal')
-    if (sq_modal) {
-		sq_modal.style.cursor = 'auto';
-	}
-  });
+	bindEvent(window, 'message', function (e) {
+		var msg = e.data;
+		if (typeof msg == "object" && msg.squirt_reply ){
+			delete msg.squirt_reply;
+			sq.cookies.values = {};
+			for (var k in msg){
+				if (msg.hasOwnProperty(k)) {
+					sq.cookies.values[k] = msg[k];
+				}
+			}
+			if (cookiesTimeout){
+				clearTimeout(cookiesTimeout);
+				makeSquirt(makeRead(makeTextToNodes(wordToNode)), makeGUI);
+			}			
+		}				
+	});	
+	var cookiesTimeout = setTimeout(function(){ 
+		makeSquirt(makeRead(makeTextToNodes(wordToNode)), makeGUI);
+	}, sq.cookies.timeout);	
+	
+  loadCookiesFrame();
 
-  (function makeSquirt(read, makeGUI) {
+  function makeSquirt(read, makeGUI) {
 
     on('squirt.again', startSquirt);
     injectStylesheet(sq.host + 'font-awesome.css');
@@ -53,7 +73,7 @@ sq.host =  'https://rawgit.com/rstudios/SquirtLocal/master/';
       }, document.head);
       handler = on('readability.ready', readabilityReady);
     };
-  })(makeRead(makeTextToNodes(wordToNode)), makeGUI);
+  }
 
   function makeRead(textToNodes) {
     sq.paused = false;
@@ -88,6 +108,10 @@ sq.host =  'https://rawgit.com/rstudios/SquirtLocal/master/';
 
       on('squirt.wpm', function(e){
         sq.wpm = Number(e.value);
+		if(sq.cookies.values.wpm != sq.wpm){
+		   sq.cookies.values.wpm = sq.wpm;
+		   saveCookies();
+		}
         wpm(e.value);
         dispatch('squirt.wpm.after');
       });
@@ -203,7 +227,7 @@ sq.host =  'https://rawgit.com/rstudios/SquirtLocal/master/';
         modal.innerHTML = '<div class="error">Oops! This page is too hard for Squirt to read. We\'ve been notified, and will do our best to resolve the issue shortly.</div>';
     };
 
-    dispatch('squirt.wpm', {value: 400});
+    dispatch('squirt.wpm', {value: ((sq.cookies.values && sq.cookies.values.wpm) ? sq.cookies.values.wpm : 400)});
 
     var wordContainer,
         prerenderer,
@@ -341,6 +365,13 @@ sq.host =  'https://rawgit.com/rstudios/SquirtLocal/master/';
     var squirt = makeDiv({class: 'sq'}, document.body);
     squirt.style.display = 'none';
     on('squirt.close', hideGUI);
+	on('mousemove', function(){
+		let sq_modal = document.querySelector('.sq .modal')
+		if (sq_modal) {
+			sq_modal.style.cursor = 'auto';
+		}
+	});		
+	
     var obscure = makeDiv({class: 'sq-obscure'}, squirt);
     on(obscure, 'click', function(){
       dispatch('squirt.close');
@@ -437,8 +468,21 @@ sq.host =  'https://rawgit.com/rstudios/SquirtLocal/master/';
     })(controls);
   };
 
+  function loadCookiesFrame(){
+	if (document.getElementById("squirt_cookies") == null) {   
+		let iframe = document.createElement('iframe');
+		iframe.style.display = "none";
+		iframe.setAttribute("id", "squirt_cookies");
+		iframe.onload = function() {
+			loadCookies();
+		};		
+		iframe.src = sq.cookies.loader;	
+		document.body.appendChild(iframe);
+	  }	
+  }
+   
   // utilites
-
+  
   function map(listLike, f){
     listLike = Array.prototype.slice.call(listLike); // for safari
     return Array.prototype.map.call(listLike, f);
@@ -537,4 +581,25 @@ sq.host =  'https://rawgit.com/rstudios/SquirtLocal/master/';
     return (el.style.display = s.display == 'none' ? 'block' : 'none') == 'block';
   };
 
+  function bindEvent(element, eventName, eventHandler) {
+    if (element.addEventListener){
+        element.addEventListener(eventName, eventHandler, false);
+    } else if (element.attachEvent) {
+        element.attachEvent('on' + eventName, eventHandler);
+    }
+  }    
+ 
+  function loadCookies(){
+	 if ( !sq.cookies.values ){ 
+	  let cookies_iframe = document.getElementById("squirt_cookies");
+	  cookies_iframe.contentWindow.postMessage({squirt_request:'getCookies'}, '*');		
+	 }
+  }
+ 
+  function saveCookies(){
+	let cookies_iframe = document.getElementById("squirt_cookies");
+	if ( cookies_iframe && sq.cookies.values ){ 
+		cookies_iframe.contentWindow.postMessage({squirt_request:'setCookies',obj:sq.cookies.values}, '*');		 
+	}	
+  }
 })();
