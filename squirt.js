@@ -412,7 +412,7 @@ sq.progressBarLocation = sq.progressBarLocation || 'bottom';
   }
 
   function makeGUI(){
-	var squirtExtraClass = (sq.progressBarLocation == 'top') ? ' top' : '';  
+	var squirtExtraClass = (sq.progressBarLocation == 'top') ? ' bar-top' : '';  
     var squirt = makeDiv({class: 'sq'+squirtExtraClass}, document.body);
     squirt.style.display = 'none';
     on('squirt.close', hideGUI);
