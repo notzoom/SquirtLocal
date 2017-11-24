@@ -235,8 +235,9 @@ sq.host =  'https://rawgit.com/rstudios/SquirtLocal/master/';
       text = "3\n 2\n 1\n " + text.trim('\n').replace(/\s+\n/g,'\n');
       return text
 			 .replace(/ \./g, '.')
+			 .replace(/(\.[\s])(?=\”)/g, '.')
 			 .replace(/([\s](\-|\—)[\s])/g, ' ')
-             .replace(/[\,\.\!\:\;](?![\"\'\)\]\}])/g, "$& ")
+             .replace(/[\,\.\!\:\;](?![\"\'\)\]\}\”])/g, "$& ")
              .split(/[\s]+/g)
              .filter(function(word){ return word.length; })
              .map(wordToNode);
