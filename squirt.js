@@ -228,7 +228,7 @@ sq.cookies = {
     };
 
 	var startWPM = ( sq.cookies.values && sq.cookies.values.wpm && !isNaN(parseInt(sq.cookies.values.wpm)) ) ? parseInt(sq.cookies.values.wpm) : 400;
-    dispatch('squirt.wpm', {value : startWPM);
+    dispatch('squirt.wpm', {value : startWPM});
 
     var wordContainer,
         prerenderer,
