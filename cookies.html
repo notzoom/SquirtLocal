@@ -24,6 +24,7 @@ function getCookies(){
 	return squirtSettings;
 }
 function setCookies(obj){
+	console.log(obj);
 	var cookie_string = '';
 	for (var k in obj){
 		if (obj.hasOwnProperty(k)) {
@@ -48,7 +49,6 @@ bindEvent(window, 'message', function (e) {
 		}			
 	}
 });
-
 window.onload = function() {
 	let cookies = getCookies();
 	let cookieSpan = document.createElement('div');
@@ -61,7 +61,6 @@ window.onload = function() {
 	cookieSpan.innerHTML = cookieText;
 	document.body.appendChild(cookieSpan);
 }
-
 </script>
 </head>
 <body></body>
