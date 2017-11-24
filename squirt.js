@@ -103,7 +103,8 @@ sq.cookies = {
       });
 
       on('squirt.wpm.adjust', function(e){
-        dispatch('squirt.wpm', {value: e.value + _wpm});
+		let new_wpm = e.value + _wpm;  
+        dispatch('squirt.wpm', {value: ((new_wpm > 0) ? new_wpm:10)});
       });
 
       on('squirt.wpm', function(e){
