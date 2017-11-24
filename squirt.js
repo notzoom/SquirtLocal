@@ -6,6 +6,7 @@ sq.cookies = {
 	timeout: 3000,
 	values: false
 };
+
 sq.progressBarLocation = sq.progressBarLocation || 'bottom';
 
 (function(){
@@ -138,7 +139,7 @@ sq.progressBarLocation = sq.progressBarLocation || 'bottom';
         dispatch(sq.paused ? 'squirt.play' : 'squirt.pause');
       });
 
-      on('squirt.rewind', function(e){
+      on('squirt.rewind', function(e){	   	  
         // Rewind by `e.value` seconds. Then walk back to the
         // beginning of the sentence.
         !sq.paused && clearTimeout(nextNodeTimeoutId);
@@ -147,11 +148,18 @@ sq.progressBarLocation = sq.progressBarLocation || 'bottom';
           incrememntNodeIdx(-1);
         }
         nextNode(true);
+		let finalWordContainer = document.querySelector('.sq .final-word');
+		let finalStyle = window.getComputedStyle(finalWordContainer);
+		if (finalStyle.display == 'block'){
+			toggle(document.querySelector('.sq .reader'));
+			toggle(finalWordContainer);
+		}				
       });
-      on('squirt.seek', function(e){
+      on('squirt.seek', function(e){	  
         !sq.paused && clearTimeout(nextNodeTimeoutId);
 		let targetNode = percentageToNode(e.percentage);
 		let idxchange = ( ( nodeIdx < targetNode ) ? Math.abs(nodeIdx - targetNode) : -Math.abs(nodeIdx - targetNode) );
+		if (idxchange != 0){
 		if (idxchange != 0){
 			incrememntNodeIdx( idxchange );
 			while(!nodes[nodeIdx].word.match(/\./) && nodeIdx < 0){
@@ -159,6 +167,13 @@ sq.progressBarLocation = sq.progressBarLocation || 'bottom';
 			}		
 			nextNode(true);
 			dispatch('squirt.updateProgress',{percentage: nodeToPercentage(targetNode)});
+			
+			let finalWordContainer = document.querySelector('.sq .final-word');
+			let finalStyle = window.getComputedStyle(finalWordContainer);
+			if (finalStyle.display == 'block'){
+				toggle(document.querySelector('.sq .reader'));
+				toggle(finalWordContainer);
+			}					
 		}			
       });
       on('squirt.updateProgress', function(e){
@@ -199,12 +214,7 @@ sq.progressBarLocation = sq.progressBarLocation || 'bottom';
 
     function finalWord(){
       toggle(document.querySelector('.sq .reader'));
-      if(window.location.hostname.match('squirt.io|localhost')){
-        window.location.href = '/install.html';
-      } else {
-        showTweetButton(nodes.length,
-          (nodes.length * intervalMs / 1000 / 60).toFixed(1));
-      }
+      showTweetButton(nodes.length,(nodes.length * intervalMs / 1000 / 60).toFixed(1));
       toggle(finalWordContainer);
       return;
     };
