@@ -4,6 +4,7 @@
   font-family: inherit;
   font-style: inherit;
   font-size: 100%;
+  line-height: normal;
   border: 0 none;
   outline: 0;
   padding: 0;
@@ -171,6 +172,7 @@
   top: 34%;
   position: absolute;
   font-size: 1.2em;
+  line-height: normal;
   padding: 15px;
 }
 
