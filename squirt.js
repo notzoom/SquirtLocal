@@ -160,7 +160,6 @@ sq.progressBarLocation = sq.progressBarLocation || 'bottom';
 		let targetNode = percentageToNode(e.percentage);
 		let idxchange = ( ( nodeIdx < targetNode ) ? Math.abs(nodeIdx - targetNode) : -Math.abs(nodeIdx - targetNode) );
 		if (idxchange != 0){
-		if (idxchange != 0){
 			incrememntNodeIdx( idxchange );
 			while(!nodes[nodeIdx].word.match(/\./) && nodeIdx < 0){
 			  incrememntNodeIdx(-1);
