@@ -63,7 +63,12 @@ sq.cookies = {
       var handler;
       function readabilityReady(){
         handler && document.removeEventListener('readility.ready', handler);
-        read(readability.grabArticleText());
+		let article = readability.grabArticle();
+		// Custom element removal
+		let removeElements = (elms) => Array.from(elms).forEach(el => el.remove());	
+		removeElements( article.querySelectorAll(".image-and-copyright-container") );	
+		// Read text
+		read(readability.grabArticleText(article));
       };
 
       if(window.readability) return readabilityReady();
