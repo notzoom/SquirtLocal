@@ -222,8 +222,6 @@ sq.host =  'https://rawgit.com/rstudios/SquirtLocal/master/';
 
       if(!text) return readabilityFail();
 
-	  console.log(textToNodes);
-	  
       nodes = textToNodes(text);
       nodeIdx = 0;
 	  
