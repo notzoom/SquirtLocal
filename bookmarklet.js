@@ -4,7 +4,7 @@ javascript:(function(){
   } else {
     window.sq = {};
     window.sq.userId = '--squirtUser--';
-	window.sq.progressBarLocation = 'bottom'; /* 'bottom' | 'top' */
+    window.sq.progressBarLocation = 'bottom'; /* 'bottom' | 'top' */
     s = document.createElement('script');
     s.src = 'https://rawgit.com/rstudios/SquirtLocal/master/squirt.js';
     s.s = window.location.search;
