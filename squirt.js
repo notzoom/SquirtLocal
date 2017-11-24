@@ -227,7 +227,8 @@ sq.cookies = {
         modal.innerHTML = '<div class="error">Oops! This page is too hard for Squirt to read. We\'ve been notified, and will do our best to resolve the issue shortly.</div>';
     };
 
-    dispatch('squirt.wpm', {value: ((sq.cookies.values && sq.cookies.values.wpm) ? sq.cookies.values.wpm : 400)});
+	var startWPM = ( sq.cookies.values && sq.cookies.values.wpm && !isNaN(parseInt(sq.cookies.values.wpm)) ) ? parseInt(sq.cookies.values.wpm) : 400;
+    dispatch('squirt.wpm', {value : startWPM);
 
     var wordContainer,
         prerenderer,
