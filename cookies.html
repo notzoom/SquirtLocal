@@ -24,7 +24,6 @@ function getCookies(){
 	return squirtSettings;
 }
 function setCookies(obj){
-	console.log(obj);
 	var cookie_string = '';
 	for (var k in obj){
 		if (obj.hasOwnProperty(k)) {
@@ -34,7 +33,7 @@ function setCookies(obj){
 	if (cookie_string.length > 0){
 		var expiration_date = new Date();
 		expiration_date.setFullYear(expiration_date.getFullYear() + 1);	
-		cookie_string += "test_cookies=true; path=/; expires=" + expiration_date.toUTCString();
+		cookie_string += " path=/; expires=" + expiration_date.toUTCString();
 		document.cookie = cookie_string;
 	}
 }
