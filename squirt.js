@@ -245,10 +245,10 @@ sq.progressBarLocation = sq.progressBarLocation || 'bottom';
       lastNode = nodes[nextIdx];
       wordContainer.appendChild(lastNode);
       lastNode.instructions && invoke(lastNode.instructions);
-      if(sq.paused) return;
-	  
 	  
 	  dispatch('squirt.updateProgress',{percentage: nodeToPercentage(nextIdx)});
+	  
+      if(sq.paused) return;
       nextNodeTimeoutId = setTimeout(nextNode, intervalMs * getDelay(lastNode, jumped));
     };
 
@@ -335,7 +335,8 @@ sq.progressBarLocation = sq.progressBarLocation || 'bottom';
 			 .replace(/(\(\s)(?=.)/g, '(')
 			 .replace(/(?=.)(\s\))/g, ')')
 			 .replace(/\s(?=[\;\!\,])/g, '')
-			 .replace(/,(?=.)/g, '$& ')
+			 .replace(/[,](?![\"\”\'])/g, '$& ')
+			 .replace(/(?!^)(?=.)[^\s](?=[\"\”\'])[^\s]/g, '$& ')
 			 .replace(/([\$\£\#])(\s{1,})/g, '$1')
              .replace(/[\,\.\!\:\;](?![\"\'\)\]\}\”])([a-zA-Z0-9]\.{1,}[\,\.\!\:\;])/g, "$& ")
              .split(/[\s]+/g)
