@@ -26,7 +26,7 @@ javascript:(function(){
     window.sq = {};
     window.sq.userId = '--squirtUser--';
     s = document.createElement('script');
-    s.src = 'https://rawgit.com/rstudios/SquirtLocal/master/squirt.js';
+    s.src = 'https://rawgit.com/notadice/SquirtLocal/master/squirt.js';
     s.s = window.location.search;
     s.idx = s.s.indexOf('sq-dev');
     document.body.appendChild(s);
