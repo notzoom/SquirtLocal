@@ -1,6 +1,6 @@
 var sq = window.sq;
 sq.version = '0.0.1';
-sq.host =  'https://rawgit.com/rstudios/SquirtLocal/master/';
+sq.host =  'https://rawgit.com/notzoom/SquirtLocal/master/';
 sq.cookies = {
 	loader: sq.host + 'cookies.html',
 	timeout: 3000,
